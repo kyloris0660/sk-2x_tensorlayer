@@ -30,7 +30,7 @@ def main():
     merged_summary = tf.summary.merge_all()
     summary_writer = tf.summary.FileWriter(TRAINING_SUMMARY_PATH, sess.graph)
 
-    for step in range(0,NUM_EPOCHS):
+    for step in range(0, NUM_EPOCHS):
         start_time = time.time()
         low_res_images, high_res_images = sess.run([low_res_batch, high_res_batch])
         feed_dict = {low_res_holder: low_res_images, high_res_holder: high_res_images}
