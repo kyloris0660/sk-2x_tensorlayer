@@ -19,9 +19,10 @@ def main():
     learning_rate = tf.train.inverse_time_decay(0.001, global_step, 10000, 2)
     train_step = tf.train.AdamOptimizer(learning_rate).minimize(training_loss, global_step=global_step)
     low_res_batch, high_res_batch = generate_train_queue(TRAIN_PATH)
-    low_res_eval, high_res_eval = generate_train_queue(TEST_PATH)
+    low_res_eval, high_res_eval = generate_test_queue(TEST_PATH)
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
+    sess.run(tf.local_variables_initializer())
     tf.train.start_queue_runners(sess=sess)
 
     # Restore the saver
@@ -37,7 +38,7 @@ def main():
         _, batch_loss = sess.run([train_step, training_loss], feed_dict=feed_dict)
         duration = time.time() - start_time
 
-        if step % 100 == 0:
+        if step % 50 == 0:
             num_examples_per_step = BATCH_SIZE
             examples_per_sec = num_examples_per_step / duration
             sec_per_batch = float(duration)
@@ -53,10 +54,10 @@ def main():
             summary = sess.run(merged_summary, feed_dict=feed_dict)
             summary_writer.add_summary(summary)
 
-        if step % 10000 == 0 or step == NUM_EPOCHS:
+        if step % 1000 == 0 or step == NUM_EPOCHS:
             saver.save(sess, join(CHECKPOINT_PATH, 'model.ckpt'), global_step=step)
 
-        print('=========training finished=========')
+    print('=========training finished=========')
 
 
 if __name__ == '__main__':
