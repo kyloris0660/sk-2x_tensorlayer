@@ -6,6 +6,9 @@ from model import *
 
 
 def main():
+    temp = input('Enter filename: ')
+    f_name = './' + temp + '.png'
+    f2x_name = OUTPUT_SAVE_PATH + temp + '_2x.png'
     ckpt_state = tf.train.get_checkpoint_state(CHECKPOINT_PATH)
     if not ckpt_state or not ckpt_state.model_checkpoint_path:
         print('No check point files are found!')
@@ -28,7 +31,7 @@ def main():
     saver = tf.train.Saver(tf.global_variables())
     saver.restore(sess, ckpt_files[-1])  # load the lateast model
 
-    low_res_img = cv.imread('./005.png')
+    low_res_img = cv.imread(f_name)
     output_size = int(inferences.get_shape()[1])
     input_size = INPUT_SIZE
     available_size = output_size // SCALE_FACTOR
@@ -63,7 +66,7 @@ def main():
     high_res_img = tf.image.convert_image_dtype(high_res_img, tf.uint8, True)
 
     high_res_img = high_res_img[:SCALE_FACTOR * img_rows, :SCALE_FACTOR * img_cols, ...]
-    cv.imwrite('./005-2x.png', high_res_img.eval(session=sess))
+    cv.imwrite(f2x_name, high_res_img.eval(session=sess))
 
     print('Enhance Finished!')
 
