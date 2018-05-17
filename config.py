@@ -8,7 +8,7 @@ JPEG_NOISE_LEVEL = 1
 GAUSSIAN_NOISE_STD = 0.01
 BATCH_SIZE = 16
 NUM_EPOCHS = 500000
-MODEL_NAME = 'vgg7'
+MODEL_NAME = 'vgg12'
 # train dataset path and etc
 TRAIN_PATH = '/Users/kyloris/Projects/image_data/data_train/'
 TEST_PATH = '/Users/kyloris/Projects/image_data/data_test/'
