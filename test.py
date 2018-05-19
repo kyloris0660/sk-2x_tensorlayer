@@ -23,6 +23,7 @@ def main():
     high_res_holder = tf.placeholder(tf.float32, shape=[BATCH_SIZE, LABEL_SIZE, LABEL_SIZE, NUM_CHANNELS])
 
     inferences = create_model(low_res_holder)
+    testing_loss = s_mse_loss(inferences, high_res_holder, name='testing_loss')
     low_res_batch, high_res_batch = generate_test_queue(TEST_PATH)
 
     sess = tf.Session()
@@ -32,7 +33,22 @@ def main():
     saver = tf.train.Saver(tf.global_variables())
     tf.train.start_queue_runners(sess=sess)
     cnt = 0
+    best_mse = 100000
+    best_ckpt = ''
+
     for ckpt_file in ckpt_files:
+        mse = 0
+        for i in range(50):
+            low_res_images, high_res_images = sess.run([low_res_batch, high_res_batch])
+            feed_dict = {low_res_holder: low_res_images, high_res_holder: high_res_images}
+            mse += sess.run(testing_loss, feed_dict=feed_dict)
+        mse /= 50
+        print('Model: %s. MSE: %.3f' % (ckpt_file, mse))
+
+        if mse < best_mse:
+            best_mse = mse
+            best_ckpt = ckpt_file
+
         print('=========================================================')
         print('=========================================================')
         print('Using models of ' + ckpt_file + ' to generate some patches.')
@@ -65,6 +81,7 @@ def main():
                 cv.imwrite(join(INFERENCE_SAVE_PATH, save_name), patch_pair.eval(session=sess))
         cnt = cnt + 1000
     print('Test Finished!')
+    print('Best model: %s. MSE: %.3f' % (best_ckpt, best_mse))
 
 
 if __name__ == '__main__':
